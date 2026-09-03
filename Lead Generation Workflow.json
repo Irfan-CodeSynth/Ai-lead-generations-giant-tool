@@ -1,0 +1,1346 @@
+{
+  "name": "Lead Generation Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "scrape-leads",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "06abd021-e345-4399-b198-be711df44a9e",
+      "name": "Webhook - Scrape Leads",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2048,
+        288
+      ],
+      "webhookId": "5af22208-c0b5-4a7c-a00b-9a9e348ba20d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "jobId",
+              "type": "string",
+              "value": "={{ $now.toMillis() }}-{{ Math.random().toString(36).slice(2) }}"
+            },
+            {
+              "id": "a2",
+              "name": "niche",
+              "type": "string",
+              "value": "={{ $json.body.niche }}"
+            },
+            {
+              "id": "a3",
+              "name": "keyword",
+              "type": "string",
+              "value": "={{ $json.body.keyword }}"
+            },
+            {
+              "id": "a4",
+              "name": "country",
+              "type": "string",
+              "value": "={{ $json.body.country }}"
+            },
+            {
+              "id": "a5",
+              "name": "state",
+              "type": "string",
+              "value": "={{ $json.body.state }}"
+            },
+            {
+              "id": "a6",
+              "name": "city",
+              "type": "string",
+              "value": "={{ $json.body.city }}"
+            },
+            {
+              "id": "a7",
+              "name": "searchString",
+              "type": "string",
+              "value": "={{ $json.body.keyword }} in {{ $json.body.city }}, {{ $json.body.state }}, {{ $json.body.country }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c2e7f9e5-5cc5-48cc-9e47-676b90e65a49",
+      "name": "Set - Generate Job Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1824,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 6464440,
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit#gid=6464440"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "jobId": "={{ $json.jobId }}",
+            "status": "queued",
+            "createdAt": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "jobId",
+              "displayName": "jobId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "completedAt",
+              "displayName": "completedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalFound",
+              "displayName": "totalFound",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "newLeads",
+              "displayName": "newLeads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duplicates",
+              "displayName": "duplicates",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f3039243-0bb3-410a-b8d1-6655d6898312",
+      "name": "Google Sheets - Append Job",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1600,
+        288
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CsLkGSaM5Ep4cFLS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"jobId\": $('Set - Generate Job Fields').item.json.jobId, \"status\": \"queued\" } }}",
+        "options": {}
+      },
+      "id": "ba160e3b-67f1-4c02-bd65-de6385a398e9",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -1376,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/compass~crawler-google-places/runs?token=REPLACE_WITH_YOUR_APIFY_TOKEN",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"searchStringsArray\": [ $('Set - Generate Job Fields').item.json.searchString ], \"maxCrawledPlacesPerSearch\": 100, \"language\": \"en\" } }}",
+        "options": {}
+      },
+      "id": "fa181d41-f646-4a07-937f-16a39652d5c8",
+      "name": "HTTP - Start Apify Run",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1376,
+        384
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JxgIRRJBSWMXQ9dl",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 6464440,
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit#gid=6464440"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "jobId": "={{ $('Set - Generate Job Fields').item.json.jobId }}",
+            "status": "scraping"
+          },
+          "matchingColumns": [
+            "jobId"
+          ],
+          "schema": [
+            {
+              "id": "jobId",
+              "displayName": "jobId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "completedAt",
+              "displayName": "completedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "totalFound",
+              "displayName": "totalFound",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "newLeads",
+              "displayName": "newLeads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "duplicates",
+              "displayName": "duplicates",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f8b57a87-1ab4-4848-abd9-445fc7d8aebe",
+      "name": "Google Sheets - Update Status Scraping",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1152,
+        384
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CsLkGSaM5Ep4cFLS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/actor-runs/{{ $('HTTP - Start Apify Run').item.json.data.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "b36b8586-fe6a-401e-a80a-0a68d59e7f9d",
+      "name": "HTTP - Poll Run Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -928,
+        384
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JxgIRRJBSWMXQ9dl",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "SUCCEEDED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ba105007-1dd5-41b6-a419-cd9affda0670",
+      "name": "IF - Run Succeeded",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -704,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 12
+      },
+      "id": "12178270-cbb7-42a1-af9e-159dd3f639a4",
+      "name": "Wait - Poll Delay",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        480
+      ],
+      "webhookId": "db35b50a-5f69-4d44-929c-599aa62be45a"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $('HTTP - Start Apify Run').item.json.data.defaultDatasetId }}/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "9dd79e30-b19d-40fe-a3cf-9a6b9f08083d",
+      "name": "HTTP - Fetch Dataset Items",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        272
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JxgIRRJBSWMXQ9dl",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c8791c03-96ef-4b27-b993-e875efbdf263",
+      "name": "Split In Batches - Leads",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -256,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 387651929,
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit#gid=387651929"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "placeId",
+              "lookupValue": "={{ $json.placeId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d673cee6-018e-423e-852e-ab862f1e09a5",
+      "name": "Google Sheets - Lookup PlaceId",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        192,
+        192
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CsLkGSaM5Ep4cFLS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.placeId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ec8f6a49-b9b4-4392-864f-5f15242515dc",
+      "name": "IF - Is Duplicate",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Split In Batches - Leads').item.json.website }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "6d8cb484-4ea5-43b5-836d-e21327a00c26",
+      "name": "HTTP - Fetch Website HTML",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        272
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = String($input.item.json.data || $input.item.json || '');\nconst emailMatch = html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);\nconst email = emailMatch ? emailMatch[0] : '';\n\nconst socialPatterns = {\n  facebook: /https?:\\/\\/(www\\.)?facebook\\.com\\/[a-zA-Z0-9_.\\-\\/]+/,\n  instagram: /https?:\\/\\/(www\\.)?instagram\\.com\\/[a-zA-Z0-9_.\\-\\/]+/,\n  linkedin: /https?:\\/\\/(www\\.)?linkedin\\.com\\/company\\/[a-zA-Z0-9_.\\-\\/]+/,\n  twitter: /https?:\\/\\/(www\\.)?(twitter|x)\\.com\\/[a-zA-Z0-9_.\\-\\/]+/\n};\nconst socials = [];\nfor (const [platform, pattern] of Object.entries(socialPatterns)) {\n  const m = html.match(pattern);\n  if (m) socials.push(platform + ':' + m[0]);\n}\n\nconst lead = $('Split In Batches - Leads').item.json;\n\nreturn [{\n  json: {\n    ...lead,\n    email,\n    socials: socials.join(', ')\n  }\n}];"
+      },
+      "id": "2336c547-14ca-4faa-9e13-bc4427f1bf3d",
+      "name": "Code - Extract Email Socials",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 387651929,
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit#gid=387651929"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "placeId": "={{ $json.placeId }}",
+            "businessName": "={{ $json.title }}",
+            "category": "={{ $json.categoryName }}",
+            "website": "={{ $json.website }}",
+            "email": "={{ $json.email }}",
+            "socials": "={{ $json.socials }}",
+            "address": "={{ $json.street }}",
+            "niche": "={{ $('Set - Generate Job Fields').item.json.niche }}",
+            "keyword": "={{ $('Set - Generate Job Fields').item.json.keyword }}",
+            "country": "={{ $('Set - Generate Job Fields').item.json.country }}",
+            "state": "={{ $('Set - Generate Job Fields').item.json.state }}",
+            "city": "={{ $('Set - Generate Job Fields').item.json.city }}",
+            "scrapedAt": "={{ $now.toISO() }}",
+            "phone": "={{ \"'\" + $json.phone }}",
+            "zipCode": "={{ $json.postalCode }}",
+            "jobId": "={{ $('Set - Generate Job Fields').first().json.jobId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "jobId",
+              "displayName": "jobId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "placeId",
+              "displayName": "placeId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "businessName",
+              "displayName": "businessName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "socials",
+              "displayName": "socials",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "zipCode",
+              "displayName": "zipCode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "niche",
+              "displayName": "niche",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "scrapedAt",
+              "displayName": "scrapedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "73117e60-eb09-477d-8795-c55ff50cf688",
+      "name": "Google Sheets - Append Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1088,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CsLkGSaM5Ep4cFLS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 6464440,
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit#gid=6464440"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "jobId": "={{ $('Set - Generate Job Fields').item.json.jobId }}",
+            "status": "done",
+            "completedAt": "={{ $now.toISO() }}",
+            "totalFound": "={{ $json.totalFound }}",
+            "newLeads": "={{ $json.newLeads }}",
+            "duplicates": "={{ $json.duplicates }}"
+          },
+          "matchingColumns": [
+            "jobId"
+          ],
+          "schema": [
+            {
+              "id": "jobId",
+              "displayName": "jobId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "completedAt",
+              "displayName": "completedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "totalFound",
+              "displayName": "totalFound",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "newLeads",
+              "displayName": "newLeads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "duplicates",
+              "displayName": "duplicates",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f854eaaa-c4d9-49eb-9b46-05efdeaa5156",
+      "name": "Google Sheets - Update Job Done",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        192,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CsLkGSaM5Ep4cFLS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "job-status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "80db062d-ce5a-4f0e-ab90-3e5e04754ed0",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1568,
+        -208
+      ],
+      "webhookId": "job-status-webhook-id"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w",
+          "mode": "list",
+          "cachedResultName": "Leads Generations ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 6464440,
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit#gid=6464440"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "jobId",
+              "lookupValue": "={{ $json.query.jobId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e0e9fcb6-8d36-46c4-9566-c545bd6cb6a9",
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1360,
+        -208
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CsLkGSaM5Ep4cFLS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "done",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d188840c-c53e-48fa-b4f4-6d1673b08383",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1136,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w",
+          "mode": "list",
+          "cachedResultName": "Leads Generations ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 387651929,
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r1o20xNMArDGHtt6lcUO7pMMtvPKeDi2ZMEzNElUA0w/edit#gid=387651929"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "jobId",
+              "lookupValue": "={{ $('Webhook').first().json.query.jobId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bc20011d-9398-4e0f-b62d-26c3a382ab98",
+      "name": "Get row(s) in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -912,
+        -320
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CsLkGSaM5Ep4cFLS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"{{ $('Get row(s) in sheet').first().json.status }}\",\n  \"totalFound\": {{ Number($('Get row(s) in sheet').first().json.totalFound || $('Get row(s) in sheet1').all().length) }},\n  \"newLeads\": {{ Number($('Get row(s) in sheet').first().json.newLeads || $('Get row(s) in sheet1').all().length) }},\n  \"duplicates\": {{ Number($('Get row(s) in sheet').first().json.duplicates || 0) }},\n  \"leads\": {{ JSON.stringify($('Get row(s) in sheet1').all().map(i => i.json).filter(j => j && (j.businessName || j['Business Name'] || j.name || j.title))) }}\n}",
+        "options": {}
+      },
+      "id": "bb0be5d8-e83e-42ff-88f9-f746734e4d6b",
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -688,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const totalFound = $input.all().length;\n\nconst duplicateResults = $('IF - Is Duplicate').all();\nlet duplicates = 0;\nfor (const item of duplicateResults) {\n  if (item.json.placeId) {\n    duplicates++;\n  }\n}\nconst newLeads = totalFound - duplicates;\n\nreturn [{ json: { totalFound, newLeads, duplicates } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        64
+      ],
+      "id": "0ee3cf11-a947-4bd9-b0e8-b232428a66e9",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Scrape Leads": {
+      "main": [
+        [
+          {
+            "node": "Set - Generate Job Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Generate Job Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Append Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Append Job": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP - Start Apify Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Start Apify Run": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Status Scraping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Status Scraping": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Poll Run Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Poll Run Status": {
+      "main": [
+        [
+          {
+            "node": "IF - Run Succeeded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Run Succeeded": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Fetch Dataset Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait - Poll Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Poll Delay": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Poll Run Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Fetch Dataset Items": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches - Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches - Leads": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets - Lookup PlaceId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Lookup PlaceId": {
+      "main": [
+        [
+          {
+            "node": "IF - Is Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Is Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches - Leads",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP - Fetch Website HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Fetch Website HTML": {
+      "main": [
+        [
+          {
+            "node": "Code - Extract Email Socials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Extract Email Socials": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Append Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Append Lead": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches - Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Job Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8dac9b24-b0d5-4b2b-be55-692e09a68cb5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7f48e6825645d0d9d907a0326028cb8150c6ebb942376421ed4fc66d1993805a"
+  },
+  "nodeGroups": [],
+  "id": "czda2KpYN7PRcBWa",
+  "tags": []
+}
